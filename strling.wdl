@@ -93,9 +93,19 @@ task str_call_joint {
   File bounds
 
   command {
+    source '/cromwell_root/gcs_transfer.sh'
     BIN=$(echo "${sep='\n' bins}" | grep ${sample}.bin)
+    BIN_DIR=$(dirname $BIN)
     echo "gsutil cp $BIN ." > ${sample}-genotype.txt
-    gsutil cp $BIN .
+    files_to_localize=(
+    "biodata-fellow"   # project to use if requester pays
+    "3" # max transfer attempts
+    $BIN_DIR # container parent directory
+    $BIN
+    )
+    localize_files "${files_to_localize[@]}"
+    ls
+    ls $BIN
   }
   runtime {
     memory: "4 GB"
