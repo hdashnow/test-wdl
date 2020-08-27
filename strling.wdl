@@ -29,13 +29,13 @@ workflow strling_joint {
       bins = str_extract.bin,
   }
 
-  scatter (cram in crams) {
+  scatter (pair in zip(crams, str_extract.bin)) {
 
      call str_call_joint {
       input:
         ref_fasta = ref_fasta,
-        bins = str_extract.bin,
-        cram = cram,
+        cram = pair.left,
+        bin = pair.right,
         bounds = str_merge.bounds,
     }
 
@@ -89,16 +89,12 @@ task str_call_joint {
   File cram
   File crai = cram + ".crai"
   String sample = basename(cram, ".cram")
-  Array[String] bins
+  File bin
   File bounds
 
   command {
-    echo "${sep=',' bins}"
-    BIN=$(echo "${sep='\n' bins}" | grep ${sample}.bin)
-    BIN_DIR=$(dirname $BIN)
-    echo "gsutil cp $BIN ." > ${sample}-genotype.txt
-    echo $BIN
-    head $BIN
+    echo "${cram} ${bin}" > ${sample}-genotype.txt
+    head ${bin}
   }
   runtime {
     memory: "4 GB"
