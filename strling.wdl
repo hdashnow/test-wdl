@@ -103,7 +103,7 @@ task str_call_joint {
     $BIN_DIR # container parent directory
     $BIN
     )
-    localize_files "${files_to_localize[@]}"
+    localize_files "\${files_to_localize[@]}"
     ls
     ls $BIN
   }
